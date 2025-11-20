@@ -17,9 +17,14 @@ public class Usuario {
     private String email;
     private String password;
 
+    private ListaTareas tareasAsignadas;
 
-    public void verTareas() {
-
+    /**
+     * Ve las tareas asignadas de user.
+     * @param user Nombre del usuario de quien se consultan las tareas.
+     */
+    public void verTareas(Usuario user) {
+        
     }
     /* ----- CONSTRUCTOR ----- */
     protected Usuario (String nombre, String nickname, String email, String password) {
