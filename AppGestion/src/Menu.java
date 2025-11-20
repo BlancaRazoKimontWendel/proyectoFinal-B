@@ -1,4 +1,16 @@
 /**
+ * ----- Mensaje genérico -----
+ * Clase administrada sólo por BRAYAN.
+ * Puede modificarse por alguien más SÓLO en caso de que quiera hacer pruebas, pero debe
+ * regresarse a su estado original. En caso de que no se reestablezca a su estado original,
+ * el pull request será rechazado.
+ * ----- Mensaje genérico -----
+ * 
+ * ----- Mensaje para VISITANTES -----
+ * 
+ * ----- Mensaje para VISITANTES -----
+ */
+/**
  * Esta clase se encarga de manejar cada tipo diferente de menú que sale en pantalla,
  * ya sea para iniciar sesión, elegir el modo de ingreso del usuario a la app, etc. 
  */
@@ -10,12 +22,14 @@ public class Menu {
     private char eleccion;
 
     /* ----- CONSTRUCTOR ----- */
+    public Menu (Diccionario<Character, String> opciones) {
+        super();
+        INDICACIONES = "Seleccione una de las siguientes opciones:";
+        this.OPCIONES = opciones;
+    }
     public Menu (String indicaciones, Diccionario<Character, String> opciones) {
         super();
         INDICACIONES = indicaciones;
-        if (!opciones.hasKey(OPCION_SALIR)) {
-            opciones.put(OPCION_SALIR, "Salida");
-        }
         this.OPCIONES = opciones;
     }
     /* ----- CONSTRUCTOR ----- */

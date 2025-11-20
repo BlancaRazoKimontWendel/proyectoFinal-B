@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * ----- Mensaje genérico -----
  * Clase administrada sólo por BRAYAN.
@@ -22,7 +24,16 @@ public class Diccionario<K,V> {
      * @param value Valor que se añade y que le corresponde a key.
      */
     public void put(K key, V value) {
-
+        Object[] clonKeys = keys.clone();
+        Object[] clonValues = values.clone();
+        keys = new Object[getSize() + 1];
+        values = new Object[getSize() + 1];
+        for (int i = 0; i < clonValues.length; i++) {
+            keys[i] = clonKeys[i];
+            values[i] = clonValues[i];
+        }
+        keys[getSize() - 1] = key;
+        values[getSize() - 1] = value;
     }
     /**
      * Busca si el diccionario tiene el valor que pasa como parámetro.
@@ -135,6 +146,10 @@ public class Diccionario<K,V> {
     }
     public Diccionario(int capacidad) {
         super();
+        if (capacidad < 0) {
+            System.out.println("La capacidad del diccionario no puede ser negativa.");
+            return;
+        }
         keys = new Object[capacidad];
         values = new Object[capacidad];
     }
@@ -160,4 +175,15 @@ public class Diccionario<K,V> {
         return values;
     }
     /* ----- ACCESO ----- */
+    /* ----- UTILERÍA ----- */
+    @Override
+    public String toString() {
+        String salida = "{ ";
+        for (int i = 0; i < keys.length; i++) {
+            salida += keys[i] + " : " + values[i] + " , ";
+        }
+        salida = salida.substring(0,salida.length()-2) + "}";
+        return salida;
+    }
+    /* ----- UTILERÍA ----- */
 }

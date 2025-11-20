@@ -18,10 +18,17 @@ import java.util.TreeMap;
 public class App {
     public static void main(String[] args) throws Exception {
         Scanner s = new Scanner(System.in);
+        /*
+        Diccionario<Character,String> opcionesInicio = new Diccionario<>(2);
+        opcionesInicio.put('1',"Iniciar sesion");
+        opcionesInicio.put('s',"Salir");
+        Menu menuInicio = new Menu(opcionesInicio);
+        */
+
         String indicaciones = "Seleccione una de las siguientes opciones:";
-        Character[] keys = {'1','s'};
-        String[] values = {"Iniciar sesión", "Salir"};
-        Diccionario<Character,String> opciones = new Diccionario<>(keys, values);
+        Character[] selecciones = {'1','2'};
+        String[] etiquetas = {"Iniciar sesión", "Salir"};
+        Diccionario<Character,String> opciones = new Diccionario<>(selecciones, etiquetas);
 
         Menu menu = new Menu(indicaciones, opciones);
         System.out.println(menu);
