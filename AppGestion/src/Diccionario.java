@@ -17,6 +17,14 @@ public class Diccionario<K,V> {
     private Object[] values;
 
     /**
+     * Pone hasta el final del diccionario la llave key con el valor value.
+     * @param key Llave que se añade.
+     * @param value Valor que se añade y que le corresponde a key.
+     */
+    public void put(K key, V value) {
+
+    }
+    /**
      * Busca si el diccionario tiene el valor que pasa como parámetro.
      * @param value El valor que se busca.
      * @return true si sí tiene a value y false si no.
@@ -39,6 +47,30 @@ public class Diccionario<K,V> {
      */
     public int getIndice(K key) {
         return buscaIndice(keys, key);
+    }
+    /**
+     * Obtiene la llave dentro del diccionario con el índice que pasa como parámetro.
+     * @param i Índice de la llave.
+     * @return La llave cuyo índice es i.
+     */
+    public V getValue(int i) {
+        if (i > getSize()) {
+            System.out.println("El índice está fuera de rango.");
+            return null;
+        }
+        return (V) values[i];
+    }
+    /**
+     * Obtiene la llave dentro del diccionario con el índice que pasa como parámetro.
+     * @param i Índice de la llave.
+     * @return La llave cuyo índice es i.
+     */
+    public K getKey(int i) {
+        if (i > getSize()) {
+            System.out.println("El índice está fuera de rango.");
+            return null;
+        }
+        return (K) keys[i];
     }
     /**
      * Busca la llave que le corresponde el valor value dentro del diccionario.
