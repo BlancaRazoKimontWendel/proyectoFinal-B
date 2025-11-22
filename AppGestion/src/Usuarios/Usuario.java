@@ -1,5 +1,7 @@
-import java.util.Scanner;
+package usuarios;
 import java.util.UUID;
+
+import excepciones.UsuarioException;
 /**
  * ----- Mensaje genérico -----
  * Clase administrada sólo por BRAYAN.
@@ -11,8 +13,8 @@ import java.util.UUID;
  * ----- Mensaje para VISITANTES -----
  * 
  * ----- Mensaje para VISITANTES -----
- * 
- * INSERTA TU PROPIO COMENTARIO DE LA CLASE.
+ * Representa a un usuario con datos de ingreso a la aplicación.
+ * @author Brayan Montiel Ramírez.
  */
 public class Usuario {
     private final String id;
@@ -21,17 +23,17 @@ public class Usuario {
     private String email;
     private String password;
 
-    private ListaTareas tareasAsignadas;
+    //private ListaTareas tareasAsignadas; TODO: Declaralarla cuando se metan Tareas y ListaTareas en un paquete.
 
     /**
      * Ve las tareas asignadas de user.
      * @param user Nombre del usuario de quien se consultan las tareas.
      */
     public void verTareas(Usuario user) {
-        
+        System.out.println("Método genérico para ver tareas.");
     }
     /* ----- CONSTRUCTOR ----- */
-    protected Usuario (String nombre, String nickname, String email, String password) {
+    protected Usuario(String nombre, String nickname, String email, String password) {
         super();
         id = UUID.randomUUID().toString();
         this.nombre = nombre;
@@ -44,9 +46,6 @@ public class Usuario {
     /* ----- ACCESO ----- */
     public String getId() {
         return id;
-    }
-    public void setId(String id) {
-        System.out.println("El ID no puede ser sobreescrito.");
     }
     public String getNombre() {
         return nombre;
