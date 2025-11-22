@@ -11,8 +11,8 @@ import java.util.UUID;
  * ----- Mensaje para VISITANTES -----
  * 
  * ----- Mensaje para VISITANTES -----
- * 
- * INSERTA TU PROPIO COMENTARIO DE LA CLASE.
+ * Representa a un usuario con datos de ingreso a la aplicación.
+ * @author Brayan Montiel Ramírez.
  */
 public class Usuario {
     private final String id;
@@ -28,7 +28,7 @@ public class Usuario {
      * @param user Nombre del usuario de quien se consultan las tareas.
      */
     public void verTareas(Usuario user) {
-        
+        System.out.println("Método genérico para ver tareas.");
     }
     /* ----- CONSTRUCTOR ----- */
     protected Usuario (String nombre, String nickname, String email, String password) {

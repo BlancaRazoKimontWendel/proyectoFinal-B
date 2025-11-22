@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 /**
  * ----- Mensaje genérico -----
  * Clase administrada sólo por BRAYAN.
@@ -12,7 +10,7 @@ import java.util.Arrays;
  * 
  * ----- Mensaje para VISITANTES -----
  * 
- * INSERTA TU PROPIO COMENTARIO DE LA CLASE.
+ * @author Brayan Montiel Ramírez.
  */
 public class Diccionario<K,V> {
     private Object[] keys;
