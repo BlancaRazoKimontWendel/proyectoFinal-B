@@ -342,10 +342,11 @@ public class App {
                 case EstadosApp.CREAR_TAREA:
                     System.out.println("Ingrese el nombre de usuario del usuario al que se le asignará esta tarea.");
                     String nickname = s.nextLine(); // TODO: manejo de excepciones
-                    if (existeUsuario(nickname)) {
-                        
+                    Usuario usuarioDestino = getUsuario(nickname);
+                    if (usuarioDestino != null) {
+                        System.out.println("Ingrese la descripción de la tarea: ");
+                        usuarioDestino.crearTareaParaMi();
                     }
-
                     break;
                 case EstadosApp.DESPLEGAR_TAREAS:
                     break;
@@ -363,24 +364,24 @@ public class App {
         s.close();
     }
     /**
-     * Verifica si existe un usuario con el nickname que pasa como parámetro.
-     * @param nickname Nombre de usuario del usuario que se busca su existencia.
-     * @return {@code true} si el usuario existe y {@code false} si no.
+     * Encuentra al usuario con el nickname que pasa como parámetro.
+     * @param nickname Nombre de usuario del usuario que se busca.
+     * @return Al usuario si este existe y {@code null} si no.
      */
-    public static boolean existeUsuario(String nickname) {
+    public static Usuario getUsuario(String nickname) {
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src\\archivos\\usuarios.dat"));
             List<Usuario> usuarios = (List<Usuario>) ois.readObject();
             for (Usuario usuario : usuarios) {
                 if (usuario.getNickname().equals(nickname)) {
-                    return true;
+                    return usuario;
                 }
             }
             ois.close(); // TODO: Revisar si sí lo debo cerrar aquí o si lo necesito después.
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
     /**
      * Le solicita las credenciales al usuario y verifica si existe un usuario con ellas.
