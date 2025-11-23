@@ -22,12 +22,12 @@ import excepciones.UsuarioException;
  */
 public class Administrador extends Usuario {
 
-    // --- CONSTRUCTOR --- 
+    // ===== CONSTRUCTOR =====
     public Administrador(String nombre, String nickname, String email, String password) {
         super(nombre, nickname, email, password);
     }
 
-    // --- IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS ---
+    // ===== IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS =====
     @Override
     public void verTareas(Usuario user) {
         // Se implementará cuando Ricardo termine ListaTareas
@@ -39,7 +39,7 @@ public class Administrador extends Usuario {
         return TipoUsuario.ADMINISTRADOR;
     }
 
-    // --- MÉTODO OBLIGATORIO (Brayan lo pide y App lo llama) ---
+    // ===== MÉTODO OBLIGATORIO (Brayan lo pide y App lo llama) =====
     public void agregarUsuario(String nombre,
                                String nickname,
                                String email,
