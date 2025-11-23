@@ -440,7 +440,7 @@ public class App {
                             listaTareas.listarTodas();
                             break;
                         case TipoUsuario.DESARROLLADOR:
-                            // TODO: desplegar mis tareas
+                            listaTareas.listarPorUsuario(usuarioActual);
                             break;
                         case TipoUsuario.INVITADO:
                             listaTareas.listarTodas();
