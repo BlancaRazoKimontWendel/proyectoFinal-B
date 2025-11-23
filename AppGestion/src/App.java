@@ -1,7 +1,9 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -168,9 +170,9 @@ class MenuDesarrollador extends MenuUsuario {
                                     OPCION_FILTRAR_TAREAS,
                                     OPCION_ACTUALIZAR_TAREAS,
                                     OPCION_CERRAR_SESION};
-        String[] etiquetas = {"Desplegar tareas",
-                                "Filtrar tareas",
-                                "Actualizar tareas",
+        String[] etiquetas = {"Desplegar mis tareas",
+                                "Filtrar mis tareas por estado",
+                                "Actualizar mis tareas",
                                 "Cerrar sesión"};
         return new Diccionario<>(selecciones, etiquetas);
     }
@@ -209,13 +211,68 @@ class MenuInvitado extends MenuUsuario {
     /* ----- CONSTRUCTOR ----- */
 }
 
+class MenuFiltroAdmin extends Menu {
+    public static final char OPCION_POR_ESTADO = '1';
+    public static final char OPCION_POR_USUARIO = '2';
+    public static final char CANCELAR_OPERACION = '3';
+    /* ----- CONSTRUCTOR ----- */
+    public MenuFiltroAdmin () {
+        super(getDiccionarioOpciones());
+        
+    }
+    /**
+     * Construye el diccionario de opciones para este menú.
+     * @return El diccionario de opciones del menú.
+     */
+    private static Diccionario<Character,String> getDiccionarioOpciones() {
+        Character[] selecciones = {OPCION_POR_ESTADO,
+                                    OPCION_POR_USUARIO,
+                                    CANCELAR_OPERACION};
+        String[] etiquetas = {"Por estado",
+                                "Por usuario",
+                                "Cancelar Operación"};
+        return new Diccionario<>(selecciones, etiquetas);
+    }
+    /* ----- CONSTRUCTOR ----- */
+}
+class MenuFiltroEstado extends Menu {
+    public static final char OPCION_PENDIENTE = '1';
+    public static final char OPCION_EN_CURSO = '2';
+    public static final char OPCION_COMPLETADA = '3';
+    /* ----- CONSTRUCTOR ----- */
+    public MenuFiltroEstado () {
+        super(getDiccionarioOpciones());
+        
+    }
+    /**
+     * Construye el diccionario de opciones para este menú.
+     * @return El diccionario de opciones del menú.
+     */
+    private static Diccionario<Character,String> getDiccionarioOpciones() {
+        Character[] selecciones = {OPCION_PENDIENTE,
+                                    OPCION_EN_CURSO,
+                                    OPCION_COMPLETADA};
+        String[] etiquetas = {"Pendiente",
+                                "En curso",
+                                "Completada"};
+        return new Diccionario<>(selecciones, etiquetas);
+    }
+    /* ----- CONSTRUCTOR ----- */
+}
+
 public class App {
+    public static final String listaTareas_dir = "\\src\\archivos\\lista_tareas.dat";
+    public static final String listaUsuarios_dir = "\\src\\archivos\\usuarios.dat";
     public static Usuario usuarioActual; // El usuario que corre la App.
+    public static ListaTareas listaTareas = ListaTareas.cargarDesdeArchivo(listaTareas_dir);
+    public static List<Usuario> listaUsuarios = cargarDesdeArchivo(listaUsuarios_dir);
     public static EstadosApp estadoActual;
     public static final EstadosApp estadoIncial = EstadosApp.INICIO; 
+    @SuppressWarnings("incomplete-switch")
     public static void main(String[] args) throws Exception {
         Scanner s = new Scanner(System.in);
         estadoActual = estadoIncial;
+
         /* ----- Máquina de estados de la App ----- */
         do {
             switch (estadoActual) {
@@ -340,23 +397,153 @@ public class App {
                     }
                     break;
                 case EstadosApp.CREAR_TAREA:
-                    System.out.println("Ingrese el nombre de usuario del usuario al que se le asignará esta tarea.");
-                    String nickname = s.nextLine(); // TODO: manejo de excepciones
-                    Usuario usuarioDestino = getUsuario(nickname);
-                    if (usuarioDestino != null) {
-                        System.out.println("Ingrese la descripción de la tarea: ");
-                        usuarioDestino.crearTareaParaMi();
+                    switch (usuarioActual.getTipo()) {
+                        case TipoUsuario.ADMINISTRADOR:
+                            boolean repetirOperacion;
+                            do {
+                                repetirOperacion = false;
+                                System.out.println("Ingrese el nombre de usuario del usuario al que se le asignará esta tarea: ");
+                                String nickname = s.nextLine(); // TODO: manejo de excepciones
+                                /* ----- CAMBIO DE ESTADO ----- */
+                                if (crearTareaPara(s, nickname)) {
+                                    System.out.println("Tarea creada con éxito.");
+                                    // TODO: OPCIONAL, hacer código para dar la opción de repetir crear
+                                } else {
+                                    System.out.println("No se pudo crear la tarea.");
+                                    if (!repetirOperacion(s)) {
+                                        repetirOperacion = true;
+                                    }
+                                }
+                            } while (repetirOperacion);
+                            break;
+                        case TipoUsuario.DESARROLLADOR:
+                            boolean repetirOperacion_;
+                            do {
+                                repetirOperacion_ = false;
+                                if (crearTareaParaMi(s)) {
+                                    System.out.println("Tarea creada con éxito.");
+                                    // TODO: OPCIONAL, hacer código para repetir operación
+                                estadoActual = EstadosApp.USO_GENERAL;
+                                } else {
+                                    System.out.println("No se pudo crear la tarea.");
+                                    if (!repetirOperacion(s)) {
+                                        estadoActual = EstadosApp.USO_GENERAL;
+                                    }
+                                }
+                            } while (repetirOperacion_);
+                            break;
                     }
                     break;
                 case EstadosApp.DESPLEGAR_TAREAS:
+                    switch (usuarioActual.getTipo()) {
+                        case TipoUsuario.ADMINISTRADOR:
+                            listaTareas.listarTodas();
+                            break;
+                        case TipoUsuario.DESARROLLADOR:
+                            // TODO: desplegar mis tareas
+                            break;
+                        case TipoUsuario.INVITADO:
+                            listaTareas.listarTodas();
+                            break;
+                    }
+                    estadoActual = EstadosApp.USO_GENERAL;
                     break;
                 case EstadosApp.FILTRAR_TAREAS:
+                    switch (usuarioActual.getTipo()) {
+                        case TipoUsuario.ADMINISTRADOR:
+                            System.out.println("Indique el tipo de filtro de búsqueda:");
+                            MenuFiltroAdmin menuFiltroAdmin = new MenuFiltroAdmin();
+                            System.out.println(menuFiltroAdmin);
+                            menuFiltroAdmin.setEleccion(s.nextLine().charAt(0)); // TODO: manejo de excepciones
+                            switch (menuFiltroAdmin.getEleccion()) {
+                                case MenuFiltroAdmin.OPCION_POR_ESTADO:
+                                    EstadoTarea estadoTarea = null;
+                                    MenuFiltroEstado menuFiltroEstado = new MenuFiltroEstado();
+                                    System.out.println("Seleccione el estado:");
+                                    System.out.println(menuFiltroEstado);
+                                    menuFiltroEstado.setEleccion(s.nextLine().charAt(0)); // TODO: manejo de excepciones
+                                    switch (menuFiltroEstado.getEleccion()) {
+                                        case MenuFiltroEstado.OPCION_PENDIENTE:
+                                            estadoTarea = EstadoTarea.PENDIENTE;
+                                            break;
+                                        case MenuFiltroEstado.OPCION_EN_CURSO:
+                                            estadoTarea = EstadoTarea.EN_CURSO;
+                                            break;
+                                        case MenuFiltroEstado.OPCION_COMPLETADA:
+                                            estadoTarea = EstadoTarea.COMPLETADA;
+                                            break;
+                                    }
+                                    listaTareas.listarPorEstado(estadoTarea);
+                                    break;
+                                case MenuFiltroAdmin.OPCION_POR_USUARIO:
+                                    boolean repetirOperacion;
+                                    do {
+                                        repetirOperacion = false;
+                                        System.out.println("Ingrese el nombre de usuario:");
+                                        String nickname = s.nextLine(); // TODO: manejo de excepciones
+                                        Usuario usuarioDestino = getUsuario(nickname);
+                                        /* ----- CAMBIO DE ESTADO ----- */
+                                        if (usuarioDestino != null) {
+                                            listaTareas.listarPorUsuario(usuarioDestino);
+                                        } else if (repetirOperacion(s)) {
+                                            repetirOperacion = true;
+                                        }
+                                    } while (repetirOperacion);
+                                    estadoActual = EstadosApp.USO_GENERAL;
+                                    break;
+                                case MenuFiltroAdmin.CANCELAR_OPERACION:
+                                    estadoActual = EstadosApp.USO_GENERAL;
+                                    break;
+                            }
+                            break;
+                        case TipoUsuario.DESARROLLADOR:
+                            EstadoTarea estadoTarea = null;
+                            MenuFiltroEstado menuFiltroEstado = new MenuFiltroEstado();
+                            System.out.println("Seleccione el estado:");
+                            System.out.println(menuFiltroEstado);
+                            menuFiltroEstado.setEleccion(s.nextLine().charAt(0)); // TODO: manejo de excepciones
+                            switch (menuFiltroEstado.getEleccion()) {
+                                case MenuFiltroEstado.OPCION_PENDIENTE:
+                                    estadoTarea = EstadoTarea.PENDIENTE;
+                                    break;
+                                case MenuFiltroEstado.OPCION_EN_CURSO:
+                                    estadoTarea = EstadoTarea.EN_CURSO;
+                                    break;
+                                case MenuFiltroEstado.OPCION_COMPLETADA:
+                                    estadoTarea = EstadoTarea.COMPLETADA;
+                                    break;
+                            }
+                            listaTareas.listarPorEstado(estadoTarea);
+                            break;
+                        case TipoUsuario.INVITADO:
+                            // TODO: Filtrar por estado.
+                            // TODO: Filtrar por usuario.
+                            // TODO: Cambio de estado.
+                            break;
+                    }
                     break;
                 case EstadosApp.ACTUALIZAR_TAREAS:
+                    switch (usuarioActual.getTipo()) {
+                        case TipoUsuario.ADMINISTRADOR:
+                            // TODO: Modificar estado de todas las tareas.
+                            // TODO: Modificar usuario de pertenencia.
+                            // TODO: Modificar descripción de todas las tareas.
+                            // TODO: Modificar fecha estimada de inicio.
+                            // TODO: Modificar fecha estimada de fin.
+                            break;
+                        case TipoUsuario.DESARROLLADOR:
+                            // TODO: Modificar estado de sus tareas.
+                            // TODO: Modificar descripción de sus tareas.
+                            // TODO: Modificar fecha estimada de inicio de sus tareas.
+                            // TODO: Modificar fecha estimada de fin de sus tareas.
+                            break;
+                    }
                     break;
                 case EstadosApp.ELIMINAR_TAREAS:
+                    // TODO: Eliminar tareas.
                     break;
                 case EstadosApp.CERRAR_SESION:
+                    System.out.println("¡Hasta luego " +  usuarioActual.getNickname() + "!");
                     estadoActual = EstadosApp.INICIO_SESION;
                     break;
             }
@@ -364,70 +551,53 @@ public class App {
         s.close();
     }
     /**
+     * Crea una tarea para sí mismo.
+     * @param s
+     * @param nickname
+     * @return
+     */
+    public static boolean crearTareaParaMi(Scanner s) {
+        System.out.println("Ingrese la descripción de la tarea: ");
+        String descripcion = s.nextLine(); // TODO: manejo de excepciones
+        System.out.println("Ingrese la fecha estimada de inicio: ");
+        String fechaEstimadaInicio = s.nextLine(); // TODO: manejo de excepciones
+        System.out.println("Ingrese la fecha estimada de fin: ");
+        String fechaEstimadaFin = s.nextLine(); // TODO: manejo de excepciones
+        ((Administrador) usuarioActual).crearTareaParaMi(/*Otros parámetros a considerar*/descripcion, fechaEstimadaInicio, fechaEstimadaFin); // TODO: manejo de excepciones
+        /* TODO: código para volver a intentar o cancelar operación */
+    }
+    /**
+     * Crea una tarea para un usuario igual o diferente a quien la está creando.
+     * @param s
+     * @param nickname
+     * @return
+     */
+    public static boolean crearTareaPara(Scanner s, String nickname) {
+        Usuario usuarioDestino = getUsuario(nickname);
+        if (usuarioDestino != null) {
+            System.out.println("Ingrese la descripción de la tarea: ");
+            String descripcion = s.nextLine(); // TODO: manejo de excepciones
+            System.out.println("Ingrese la fecha estimada de inicio: ");
+            String fechaEstimadaInicio = s.nextLine(); // TODO: manejo de excepciones
+            System.out.println("Ingrese la fecha estimada de fin: ");
+            String fechaEstimadaFin = s.nextLine(); // TODO: manejo de excepciones
+            ((Administrador) usuarioActual).crearTareaPara(/*Otros parámetros a considerar*/usuarioDestino, descripcion, fechaEstimadaInicio, fechaEstimadaFin); // TODO: manejo de excepciones
+            /* TODO: código para volver a intentar o cancelar operación */
+        }
+    }
+    /**
      * Encuentra al usuario con el nickname que pasa como parámetro.
      * @param nickname Nombre de usuario del usuario que se busca.
      * @return Al usuario si este existe y {@code null} si no.
      */
+    @SuppressWarnings("unchecked")
     public static Usuario getUsuario(String nickname) {
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src\\archivos\\usuarios.dat"));
-            List<Usuario> usuarios = (List<Usuario>) ois.readObject();
-            for (Usuario usuario : usuarios) {
-                if (usuario.getNickname().equals(nickname)) {
-                    return usuario;
-                }
+        for (Usuario usuario : listaUsuarios) {
+            if (usuario.getNickname().equals(nickname)) {
+                return usuario;
             }
-            ois.close(); // TODO: Revisar si sí lo debo cerrar aquí o si lo necesito después.
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
         }
         return null;
-    }
-    /**
-     * Le solicita las credenciales al usuario y verifica si existe un usuario con ellas.
-     * En ese caso establece {@code usuarioActual} como ese usuario.
-     * @param s Scanner con el que el usuario se comunica con el programa.
-     * @return {@code true} si las credenciales son de un usuario existente y {@code false}
-     * si no.
-     */
-    public static boolean validaCredenciales(Scanner s) {
-        System.out.println("Ingrese su correo/nombre de usuario y su contraseña.");
-        System.out.println("Correo/Nombre de usuario: ");
-        String emailNickname = s.next(); //TODO: manejo de excepciones.
-        System.out.println("Contraseña: ");
-        String password = s.next(); //TODO: manejo de excepciones.
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src\\archivos\\usuarios.dat"));
-            List<Usuario> usuarios = (List<Usuario>) ois.readObject();
-            for (Usuario usuario : usuarios) {
-                /* Optimización de búsqueda */
-                if (usuario.getEmail().equals(emailNickname) || usuario.getNickname().equals(emailNickname)) {
-                    if (usuario.getPassword() == password) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-            ois.close(); // TODO: Revisar si sí lo debo cerrar aquí o si lo necesito después.
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    /**
-     * Verifica si se desea repetir la operación reciente.
-     * @param s Teclado con el que se comunica el usuario.
-     * @return {@code true} si el usuario desea repetir la operación y {@code false} si no.
-     */
-    public static boolean repetirOperacion(Scanner s) {
-        MenuOperacion menuOperacion = new MenuOperacion();
-        System.out.println(menuOperacion);
-        menuOperacion.setEleccion(s.nextLine().charAt(0)); // TODO: manejo de excepciones
-        if (menuOperacion.getEleccion() == MenuOperacion.OPCION_REPETIR) {
-            return true;
-        }
-        return false;
     }
     /**
      * Solicita los datos de un usuario para agregarlo al achivo usuarios.dat e indica si la
@@ -488,5 +658,70 @@ public class App {
         }
         
     }
-
+    /**
+     * Le solicita las credenciales al usuario y verifica si existe un usuario con ellas.
+     * En ese caso establece {@code usuarioActual} como ese usuario.
+     * @param s Scanner con el que el usuario se comunica con el programa.
+     * @return {@code true} si las credenciales son de un usuario existente y {@code false}
+     * si no.
+     */
+    public static boolean validaCredenciales(Scanner s) {
+        System.out.println("Ingrese su correo/nombre de usuario y su contraseña.");
+        System.out.println("Correo/Nombre de usuario: ");
+        String emailNickname = s.next(); //TODO: manejo de excepciones.
+        System.out.println("Contraseña: ");
+        String password = s.next(); //TODO: manejo de excepciones.
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src\\archivos\\usuarios.dat"));
+            for (Usuario usuario : listaUsuarios) {
+                /* Optimización de búsqueda */
+                if (usuario.getEmail().equals(emailNickname) || usuario.getNickname().equals(emailNickname)) {
+                    if (usuario.getPassword() == password) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+            ois.close(); // TODO: Revisar si sí lo debo cerrar aquí o si lo necesito después.
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    /**
+     * Verifica si se desea repetir la operación reciente.
+     * @param s Teclado con el que se comunica el usuario.
+     * @return {@code true} si el usuario desea repetir la operación y {@code false} si no.
+     */
+    public static boolean repetirOperacion(Scanner s) {
+        MenuOperacion menuOperacion = new MenuOperacion();
+        System.out.println(menuOperacion);
+        menuOperacion.setEleccion(s.nextLine().charAt(0)); // TODO: manejo de excepciones
+        if (menuOperacion.getEleccion() == MenuOperacion.OPCION_REPETIR) {
+            return true;
+        }
+        return false;
+    }
+    @SuppressWarnings("unchecked")
+    /**
+     * Carga la lista de usuarios desde el archivo con la ruta que pasa como parámetro.
+     * @param ruta Ruta del archivo de usuarios.
+     * @return Lista de usuarios del archivo.
+     */
+    public static ArrayList<Usuario> cargarDesdeArchivo(String ruta) {
+        File f = new File(ruta);
+        if (!f.exists()) {
+            return new ArrayList<Usuario>();
+        }
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f))) {
+            Object obj = ois.readObject();
+            if (obj instanceof ArrayList<?>) {
+                return (ArrayList<Usuario>) obj;
+            }
+        } catch (Exception e) {
+            System.out.println("No se pudo cargar la lista de usuarios. Se iniciará una nueva. Detalle: " + e.getMessage());
+        }
+        return new ArrayList<Usuario>();
+    }
 }
