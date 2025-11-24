@@ -1,10 +1,17 @@
 package estados;
 
 import java.util.Scanner;
-
-public class EstadoSalida extends Estado {
+/**
+ * Estado que se ejecuta cuando el usuario decide salir de la aplicación.
+ * @author Brayan Montiel Ramírez.
+ */
+public class EstadoSalir extends Estado {
+    
+    public Estado ejecutar(Scanner s) {
+        return new EstadoSalir();
+    }
     /* ----- CONSTRUCTOR ----- */
-    public EstadoSalida() {
+    public EstadoSalir() {
         super(EstadosApp.SALIR);
     }
     /* ----- CONSTRUCTOR ----- */
@@ -14,7 +21,4 @@ public class EstadoSalida extends Estado {
         return "EstadoSalida []";
     }
     /* ----- UTILERÍA ----- */
-    public EstadosApp ejecutar(Scanner s) {
-        return null;
-    }
 }

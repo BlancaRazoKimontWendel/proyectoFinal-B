@@ -1,5 +1,10 @@
 package menues;
-
+/**
+ * Representa una opción de un menú, con una etiqueta que se puede imprimir
+ * en pantalla y un identificador único que lo compara con otras opciones del
+ * mismo menú.
+ * @author Brayan Montiel Ramírez.
+ */
 public class Opcion {
     private final String etiqueta;
     private char identificador;
@@ -47,8 +52,6 @@ public class Opcion {
     public Opcion clone() {
         return new Opcion(etiqueta, identificador);
     }
-    /*  En el menú nos interesa que las opciones se comparen como objetos, por eso no
-        colocamos el método equals */
     /* ----- UTILERÍA ----- */
     
 }

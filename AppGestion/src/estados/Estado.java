@@ -31,8 +31,9 @@ public abstract class Estado {
      * Implementa la lógica del estado en curso.
      * @param s : Teclado con el cual se comunica el usuario.
      * @return : El nuevo estado al que pasa la aplicación tras la ejecución de este.
+     * @throws Exception 
      */
-    public abstract EstadosApp ejecutar(Scanner s);
+    public abstract Estado ejecutar(Scanner s) throws Exception;
     /**
      * Compara a dos estados por su referencia.
      * @param estado : Estado con el que {@code this} se compara.

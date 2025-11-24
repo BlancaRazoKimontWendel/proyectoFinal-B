@@ -1,7 +1,11 @@
 package menues;
 
 import java.util.Scanner;
-
+/**
+ * Clase para ejemplificar el uso de los menúes y hacer pruebas de su
+ * funcionamiento.
+ * @author Brayan Montiel Ramírez.
+ */
 public class PruebaMenu {
     public static void main(String[] args) throws Exception {
         Scanner s = new Scanner(System.in);
@@ -16,7 +20,7 @@ public class PruebaMenu {
         menuSalida.addOpcion("Opción 3");
         menuSalida.close();
         System.out.println(menuSalida);
-        MenuInicio menuInicio = new MenuInicio();
+        MenuInicioApp menuInicio = new MenuInicioApp();
         menuInicio.close();
         System.out.println(menuInicio);
 

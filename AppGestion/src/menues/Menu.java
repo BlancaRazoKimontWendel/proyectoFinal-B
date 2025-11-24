@@ -5,7 +5,11 @@ import java.util.List;
 
 import excepciones.IdNoEncontradoException;
 import excepciones.IdRepetidoException;
-
+/**
+ * Representa el estado más básico de un menú sólo con opciones e identificadores de estas que
+ * se crean de manera creciente de acuerdo al número de opciones que este tiene.
+ * @author Brayan Montiel Ramírez.
+ */
 public class Menu {
     private List<Opcion> listaOpciones = new ArrayList<>();
     private Opcion eleccion;

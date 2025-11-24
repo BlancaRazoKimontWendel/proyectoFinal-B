@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import excepciones.UsuarioExisteException;
 import menues.Menu;
 import recursos.*;
 import tareas.*;

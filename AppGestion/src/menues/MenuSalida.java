@@ -3,12 +3,13 @@ package menues;
 import excepciones.IdRepetidoException;
 
 /**
- * Representa a un menú donde se da la opción de salir o cualquier opción equivalente,
+ * Representa a un menú donde se da la opción de <i>salir</i> o cualquier opción equivalente,
  * como <i>cancelar una operación</i>.
  * @author Brayan Montiel Ramírez.
  */
 public class MenuSalida extends Menu {
     private final Opcion opcionSalida;
+    public static final char identificadorSalida = 's';
 
     @Override
     public void close() throws MenuClosedException {
@@ -26,7 +27,15 @@ public class MenuSalida extends Menu {
     /* ----- CONSTRUCTOR ----- */
     public MenuSalida(String etiquetaSalida) throws IdRepetidoException, MenuClosedException {
         super();
-        opcionSalida = new Opcion(etiquetaSalida, 's');
+        opcionSalida = new Opcion(etiquetaSalida, identificadorSalida);
     }
     /* ----- CONSTRUCTOR ----- */
+    /* ----- ACCESO ----- */
+    public Opcion getOpcionSalida() {
+        return opcionSalida;
+    }
+    public char getIdentificadorSalida() {
+        return identificadorSalida;
+    }
+    /* ----- ACCESO ----- */
 }
