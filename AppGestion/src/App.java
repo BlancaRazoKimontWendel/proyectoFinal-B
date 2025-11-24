@@ -26,23 +26,6 @@ import usuarios.*;
  * 
  * INSERTA TU PROPIO COMENTARIO DE LA CLASE.
  */
-class MenuInicio extends Menu {
-    public static final char OPCION_INICIAR_SESION = '1';
-    /* ----- CONSTRUCTOR ----- */
-    public MenuInicio () {
-        super(getDiccionarioOpciones());
-    }
-    /**
-     * Construye el diccionario de opciones para este menú.
-     * @return El diccionario de opciones del menú.
-     */
-    private static Diccionario<Character,String> getDiccionarioOpciones() {
-        Character[] selecciones = {OPCION_INICIAR_SESION, OPCION_SALIR};
-        String[] etiquetas = {"Iniciar sesión", "Salir"};
-        return new Diccionario<>(selecciones, etiquetas);
-    }
-    /* ----- CONSTRUCTOR ----- */
-}
 class MenuOperacion extends Menu {
     public static final char OPCION_REPETIR= '1';
     public static final char OPCION_CANCELAR = '2';
