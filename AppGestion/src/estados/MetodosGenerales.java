@@ -21,16 +21,7 @@ public class MetodosGenerales {
     public static boolean repetirOperacion(Scanner s) throws Exception{
         MenuOperacion menuOperacion = new MenuOperacion();
         menuOperacion.close();
-        System.out.println(menuOperacion);
-        while (true) {
-            try {
-                char identificador = ScannerHelper.leerChar(s);
-                menuOperacion.setEleccion(identificador);
-                break;
-            } catch (InvalidCharException | NoSuchElementException | IdNoEncontradoException e) {
-                System.out.println("Operación no válida. Intente de nuevo.");
-            }
-        }
+        solicitaEntrada(s, menuOperacion, "");
         switch (menuOperacion.getEleccion().getIdentificador()) {
             case '1':
                 return true;

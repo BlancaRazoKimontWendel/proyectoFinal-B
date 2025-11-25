@@ -1,21 +1,20 @@
 package estados;
 
-import java.util.List;
 import java.util.Scanner;
 
+import singleton.AppComunicador;
+import singleton.SingletonClosedException;
 import usuarios.Usuario;
 /**
  * Estado que se ejecuta cuando el usuario está iniciando sesión.
  * @author Brayan Montiel Ramírez.
  */
 public class EstadoInicioSesion extends Estado {
-    public static Usuario usuarioActual = AppComunicador.usuarioActual;
-    public static List<Usuario> listaUsuarios = AppComunicador.listaUsuarios;
     
     public Estado ejecutar(Scanner s) throws Exception{
         if (validaCredenciales(s)) {
             System.out.println("Credenciales válidas." +
-                                "\n¡Bienvenido" + usuarioActual.getNickname() + "!");
+                                "\n¡Bienvenido" + AppComunicador.getInstancia().getUsuarioActual().getNickname() + "!");
             return new EstadoUsoGeneral();
         } else {
             System.out.println("Las credenciales ingresadas no son válidas.");
@@ -38,13 +37,18 @@ public class EstadoInicioSesion extends Estado {
         System.out.print("Correo/Nombre de usuario: ");
         String emailNickname = s.next(); //TODO: OPCIONAL manejo de excepciones Long.
 
-        for (Usuario usuario : listaUsuarios) {
+        for (Usuario usuario : AppComunicador.getInstancia().getListaUsuarios()) {
             /* Optimización de búsqueda */
             if (usuario.getEmail().equals(emailNickname) || usuario.getNickname().equals(emailNickname)) {
                 System.out.print("Contraseña: ");
                 String password = s.next(); //TODO: OPCIONAL manejo de excepciones Long.
                 if (usuario.getPassword().equals(password)) {
-                    usuarioActual = usuario;
+                    try {
+                        AppComunicador.getInstancia().setUsuarioActual(usuario);
+                    } catch (SingletonClosedException sce) {
+                        System.out.println("El singleton no debió ser cerrado hasta el final del programa.");
+                    }
+                    System.out.println("Usuario ingresado: " + AppComunicador.getInstancia().getUsuarioActual());
                     return true;
                 } else {
                     return false;

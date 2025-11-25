@@ -1,15 +1,11 @@
 package estados;
 
-import java.util.List;
 import java.util.Scanner;
 
-import excepciones.IdRepetidoException;
 import menues.MenuClosedException;
 import menues.MenuSalida;
 import recursos.TipoUsuario;
-import tareas.ListaTareas;
-import usuarios.Usuario;
-import recursos.ScannerHelper;
+import singleton.AppComunicador;
 
 /**
  * Menú del usuario genérico, con la opción de cerrar sesión.
@@ -74,15 +70,13 @@ class MenuInvitado extends MenuUsuario {
  * @author Brayan Montiel Ramírez.
  */
 public class EstadoUsoGeneral extends Estado {
-    public static Usuario usuarioActual = AppComunicador.usuarioActual; // El usuario que corre la App.
     
-    public Estado ejecutar(Scanner s) throws Exception{
+    public Estado ejecutar(Scanner s) throws Exception {
         MenuUsuario menuUsuario = new MenuUsuario();
-        switch (usuarioActual.getTipo()) {
+        switch (AppComunicador.getInstancia().getUsuarioActual().getTipo()) {
             case TipoUsuario.ADMINISTRADOR:
                 menuUsuario = new MenuAdministrador();
                 menuUsuario.close();
-                System.out.println(menuUsuario);
                 MetodosGenerales.solicitaEntrada(s, menuUsuario, "Seleccione la acción que desea realizar");
                 /* ----- CAMBIO DE ESTADO ----- */
                 switch (menuUsuario.getEleccion().getIdentificador()) {
@@ -100,8 +94,9 @@ public class EstadoUsoGeneral extends Estado {
                         return new EstadoEliminarTareas();
                     case MenuUsuario.IDENTIFICADOR_CERRAR_SESION:
                         return new EstadoCerrarSesion();
+                    default:
+                        throw new Exception();
                 }
-                break;
             case TipoUsuario.DESARROLLADOR:
                 menuUsuario = new MenuDesarrollador();
                 menuUsuario.close();
@@ -119,8 +114,9 @@ public class EstadoUsoGeneral extends Estado {
                         return new EstadoActualizarTareas();
                     case MenuUsuario.IDENTIFICADOR_CERRAR_SESION:
                         return new EstadoCerrarSesion();
+                    default:
+                        throw new Exception();
                 }
-                break;
             case TipoUsuario.INVITADO:
                 menuUsuario = new MenuInvitado();
                 menuUsuario.close();
@@ -134,8 +130,11 @@ public class EstadoUsoGeneral extends Estado {
                         return new EstadoDesplegarTareas();
                     case MenuUsuario.IDENTIFICADOR_CERRAR_SESION:
                         return new EstadoCerrarSesion();
+                    default:
+                        throw new Exception();
                 }
-                break;
+            default:
+                throw new Exception();
         }
     }
     /* ----- CONSTRUCTOR ----- */

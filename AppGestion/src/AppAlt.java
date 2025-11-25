@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import estados.*;
+import singleton.AppComunicador;
 import usuarios.Administrador;
 import usuarios.Desarrollador;
 import usuarios.Usuario;
@@ -23,8 +24,6 @@ public class AppAlt {
     /* ----- VARIABLES PARA LA MÁQUINA ----- */
     public static void main(String[] args) throws Exception {
         verificarListaInicial();
-        AppComunicador.cargaUsuarios();
-        AppComunicador.cargaTareas();
         System.out.println("\n¡Bienvenido a nuestra App de Gestión de Tareas!" +
                             "\nGracias por su preferencia."
         );
@@ -34,9 +33,6 @@ public class AppAlt {
         }
         s.close();
         /* ----- MÁQUINA DE ESTADOS ----- */
-        System.out.println("Gracias por usar nuestra App." +
-                            "\n¡Hasta luego!\n"
-        );
     }
     /**
      * Verifica si ya hay una lista inicial de usuarios. En caso de no haberla, la
