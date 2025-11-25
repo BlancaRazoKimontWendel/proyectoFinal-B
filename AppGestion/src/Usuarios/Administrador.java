@@ -1,9 +1,9 @@
 package usuarios;
 
-import recursos.TipoUsuario;
-
 import java.util.List;
-import java.io.*;
+
+import recursos.TipoUsuario;
+import singleton.AppComunicador;
 
 /**
  * ----- Mensaje genérico -----
@@ -20,7 +20,7 @@ import java.io.*;
  */
 public class Administrador extends Usuario {
 
-    // ===== CONSTRUCTOR =====
+    // ---- CONSTRUCTOR ----
     public Administrador(String nombre, String nickname, String email, String password) {
         super(nombre, nickname, email, password);
     }
@@ -28,8 +28,8 @@ public class Administrador extends Usuario {
     // ---- IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS ----
     @Override
     public void verTareas(Usuario user) {
-        // Se implementará cuando Ricardo termine ListaTareas
-        System.out.println("Función verTareas(user) aún no disponible.");
+        // Cuando se defina qué salida exacta se quiere?
+        System.out.println("Función verTareas(user) aún no disponible para Administrador:(.");
     }
 
     @Override
@@ -37,7 +37,22 @@ public class Administrador extends Usuario {
         return TipoUsuario.ADMINISTRADOR;
     }
 
-    // ---- MÉTODO OBLIGATORIO :) ----
+    /**
+     * Agrega un nuevo usuario a la lista global manejada por AppComunicador.
+     * 
+     * Reglas:
+     * - No se permite repetir nickname.
+     * - No se permite repetir email.
+     * - Si ambos están repetidos, se prioriza reportar el nickname,
+     *   por eso se usa if / else if.
+     *
+     * @param nombre   Nombre del usuario.
+     * @param nickname Nickname (nombre de usuario).
+     * @param email    Correo electrónico.
+     * @param password Contraseña.
+     * @param rol      Rol del usuario (ADMINISTRADOR, DESARROLLADOR o INVITADO).
+     * @throws UsuarioExisteException si el nickname o el email ya existen.
+     */
     public void agregarUsuario(String nombre,
                                String nickname,
                                String email,
@@ -45,52 +60,40 @@ public class Administrador extends Usuario {
                                TipoUsuario rol)
                                throws UsuarioExisteException {
 
-        // Cargar archivo de usuarios
-        File archivo = new File("src/archivos/usuarios.dat");
-        List<Usuario> usuarios;
+        // Obtenemos la lista de usuarios en memoria desde el singleton. 
+        // AppComunicador se encarga de cargarla de archivo al iniciar y de guardarla cuando se cierra, no?.
+        List<Usuario> usuarios = AppComunicador.getInstancia().getListaUsuarios();
 
-        try {
-            if (archivo.exists()) {
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo));
-                usuarios = (List<Usuario>) ois.readObject();
-                ois.close();
-            } else {
-                usuarios = new java.util.ArrayList<>();
+        // Validar nickname o email duplicado
+        for (Usuario u : usuarios) {
+            if (u.getNickname().equals(nickname)) {
+                // Si nickname ya existe, prioritario reportarlo
+                throw new UsuarioExisteException("Nickname duplicado", "nickname");
+            } else if (u.getEmail().equals(email)) {
+                // Sólo se revisa email si el nickname NO era duplicado
+                throw new UsuarioExisteException("Email duplicado", "email");
             }
-
-            // Validar nickname o email duplicado
-            for (Usuario u : usuarios) {
-                if (u.getNickname().equals(nickname)) {
-                    throw new UsuarioExisteException("Nickname duplicado", "nickname");
-                }
-                if (u.getEmail().equals(email)) {
-                    throw new UsuarioExisteException("Email duplicado", "email");
-                }
-            }
-
-            // Crear el usuario según rol
-            Usuario nuevo = null;
-            switch (rol) {
-                case ADMINISTRADOR:
-                    nuevo = new Administrador(nombre, nickname, email, password);
-                    break;
-                case DESARROLLADOR:
-                    nuevo = new Desarrollador(nombre, nickname, email, password);
-                    break;
-                case INVITADO:
-                    nuevo = new Invitado(nombre, nickname, email, password);
-                    break;
-            }
-
-            usuarios.add(nuevo);
-
-            // Guardar de nuevo en archivo
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo));
-            oos.writeObject(usuarios);
-            oos.close();
-
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
         }
+
+        // Crear el usuario según su rol
+        Usuario nuevo = null;
+        switch (rol) {
+            case ADMINISTRADOR:
+                nuevo = new Administrador(nombre, nickname, email, password);
+                break;
+            case DESARROLLADOR:
+                nuevo = new Desarrollador(nombre, nickname, email, password);
+                break;
+            case INVITADO:
+                nuevo = new Invitado(nombre, nickname, email, password);
+                break;
+            default:
+                // No debería pasar porque TipoUsuario es un enum cerrado, pero ahi lo dejo.
+                throw new IllegalArgumentException("Rol de usuario no reconocido: " + rol);
+        }
+
+        // Añadimos el nuevo usuario a la lista en memoria.
+
+        usuarios.add(nuevo);
     }
 }
