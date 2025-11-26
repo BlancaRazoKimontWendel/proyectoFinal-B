@@ -1,9 +1,7 @@
 package usuarios;
 
 import recursos.TipoUsuario;
-
 import java.util.List;
-import java.io.*;
 
 /**
  * ----- Mensaje genérico -----
@@ -37,60 +35,66 @@ public class Administrador extends Usuario {
         return TipoUsuario.ADMINISTRADOR;
     }
 
-    // ---- MÉTODO OBLIGATORIO :) ----
-    public void agregarUsuario(String nombre,
-                               String nickname,
-                               String email,
-                               String password,
-                               TipoUsuario rol)
-                               throws UsuarioExisteException {
+    /**
+     * Agrega un usuario nuevo a la lista recibida, verificando:
+     *  - Que el nickname no esté repetido.
+     *  - Que el email no esté repetido.
+     *
+     * IMPORTANTE:
+     *  - No accede a archivos.
+     *  - No usa AppComunicador ni Scanner.
+     *  - Toda la interacción con el usuario y la persistencia la hacen los estados / singleton.
+     *
+     * @param listaUsuarios lista donde se agregará el nuevo usuario.
+     * @param nombre        nombre del usuario.
+     * @param nickname      nickname (debe ser único).
+     * @param email         correo (debe ser único).
+     * @param password      contraseña.
+     * @param rol           tipo de usuario a crear.
+     * @return              el usuario recién creado y añadido a la lista.
+     * @throws UsuarioExisteException si nickname o email ya están registrados.
+     */
+    public Usuario agregarUsuario(List<Usuario> listaUsuarios,
+                                  String nombre,
+                                  String nickname,
+                                  String email,
+                                  String password,
+                                  TipoUsuario rol)
+                                  throws UsuarioExisteException {
 
-        // Cargar archivo de usuarios
-        File archivo = new File("src/archivos/usuarios.dat");
-        List<Usuario> usuarios;
-
-        try {
-            if (archivo.exists()) {
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo));
-                usuarios = (List<Usuario>) ois.readObject();
-                ois.close();
-            } else {
-                usuarios = new java.util.ArrayList<>();
+        // Primero validamos nickname duplicado
+        for (Usuario u : listaUsuarios) {
+            if (u.getNickname().equals(nickname)) {
+                throw new UsuarioExisteException("Nickname duplicado", "nickname");
             }
-
-            // Validar nickname o email duplicado
-            for (Usuario u : usuarios) {
-                if (u.getNickname().equals(nickname)) {
-                    throw new UsuarioExisteException("Nickname duplicado", "nickname");
-                }
-                if (u.getEmail().equals(email)) {
-                    throw new UsuarioExisteException("Email duplicado", "email");
-                }
-            }
-
-            // Crear el usuario según rol
-            Usuario nuevo = null;
-            switch (rol) {
-                case ADMINISTRADOR:
-                    nuevo = new Administrador(nombre, nickname, email, password);
-                    break;
-                case DESARROLLADOR:
-                    nuevo = new Desarrollador(nombre, nickname, email, password);
-                    break;
-                case INVITADO:
-                    nuevo = new Invitado(nombre, nickname, email, password);
-                    break;
-            }
-
-            usuarios.add(nuevo);
-
-            // Guardar de nuevo en archivo
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo));
-            oos.writeObject(usuarios);
-            oos.close();
-
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
         }
+
+        // Luego validamos email duplicado
+        for (Usuario u : listaUsuarios) {
+            if (u.getEmail().equals(email)) {
+                throw new UsuarioExisteException("Email duplicado", "email");
+            }
+        }
+
+        // Crear el usuario según rol
+        Usuario nuevo;
+        switch (rol) {
+            case ADMINISTRADOR:
+                nuevo = new Administrador(nombre, nickname, email, password);
+                break;
+            case DESARROLLADOR:
+                nuevo = new Desarrollador(nombre, nickname, email, password);
+                break;
+            case INVITADO:
+                // Esta clase la administra Fernanda.
+                // Debe existir un constructor compatible: Invitado(String, String, String, String)
+                nuevo = new Invitado(nombre, nickname, email, password);
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo de usuario no soportado: " + rol);
+        }
+
+        listaUsuarios.add(nuevo);
+        return nuevo;
     }
 }
