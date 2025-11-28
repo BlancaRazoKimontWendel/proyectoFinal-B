@@ -9,6 +9,8 @@ import recursos.TipoUsuario;
 import singleton.AppComunicador;
 import usuarios.Administrador;
 import usuarios.UsuarioExisteException;
+import java.util.List;
+import usuarios.Usuario;
 
 class MenuRoles extends Menu {
     /* ----- CONSTRUCTOR ----- */
@@ -41,13 +43,14 @@ public class EstadoAgregarUsuario extends Estado {
         }
         return new EstadoAgregarUsuario();
     }
+
     /**
-     * Solicita los datos de un usuario para agregarlo al achivo usuarios.dat e indica si la
-     * operación se realizó con éxito-
+     * Solicita los datos de un usuario para agregarlo al archivo usuarios.dat e indica si la
+     * operación se realizó con éxito.
      * @param s Teclado con el que el usuario se comunica.
-     * @return {@code true} si se agregó al usuario al archivo usuarios.dat y {@code false} si no.
+     * @return {@code true} si se agregó al usuario a la lista de usuarios y {@code false} si no.
      */
-    private boolean agregaUsuario(Scanner s) throws Exception{
+    private boolean agregaUsuario(Scanner s) throws Exception {
         System.out.print("Nombre: ");
         String nombre = s.next();
         System.out.println();
@@ -75,28 +78,38 @@ public class EstadoAgregarUsuario extends Estado {
                 rol = TipoUsuario.INVITADO;
                 break;
             default:
-                throw new Exception();
+                throw new Exception("Rol no válido");
         }
+
         try {
             if (usuarioConfirma(s)) {
-                ((Administrador) AppComunicador.getInstancia().getUsuarioActual()).agregarUsuario(nombre, nickname, email, password, rol);
+                // Aquí usamos el singleton SOLO desde el estado 
+                Administrador admin = (Administrador) AppComunicador.getInstancia().getUsuarioActual();
+                List<Usuario> lista = AppComunicador.getInstancia().getListaUsuarios();
+
+                admin.agregarUsuario(lista, nombre, nickname, email, password, rol);
                 return true; // <--- Si se añade.
             }
         } catch (UsuarioExisteException uee) {
-            String datoDuplicado = "";
+            String mensajeBonito;
+
             switch (uee.getDatoDuplicado()) {
                 case "nickname":
-                    datoDuplicado = "nombre de usuario \"" + nickname + "\"";
+                    mensajeBonito = "El nombre de usuario \"" + nickname + "\" ya ha sido registrado. "
+                                  + "Por favor, elige otro nickname.";
                     break;
                 case "email":
-                    datoDuplicado = "correo electrónico \"" + email + "\"";
+                    mensajeBonito = "El correo electrónico \"" + email + "\" ya ha sido registrado. "
+                                  + "Por favor, usa otro correo.";
                     break;
+                default:
+                    mensajeBonito = "Alguno de los datos ingresados ya está registrado. "
+                                  + "Intente de nuevo con otros datos.";
             }
-            System.out.println("El " + datoDuplicado + " " + 
-                                (datoDuplicado == "nickname" ? nickname : email ) + 
-                                " ya ha sido registrado.");
-            // TODO: mejorar el sistema para que lo especifique en el momento donde se introdujo el dato.
+
+            System.out.println(mensajeBonito);
         }
+
         return false; //<--- Si no se añade.
     }
     /**
