@@ -34,8 +34,13 @@ public class AppComunicador {
         if (closed) {
             throw new SingletonClosedException();
         }
-        listaTareas.guardarEnArchivo(listaTareas_dir);
-        guardarUsuariosEn(listaUsuarios_dir);
+        if (listaTareas != null) {
+            // TODO: Decidir si es mejor una verificación por longitud no nula de la lista en lugar de null. 
+            listaTareas.guardarEnArchivo(listaTareas_dir);
+        }
+        if (listaUsuarios != null) {
+            guardarUsuariosEn(listaUsuarios_dir);
+        }
         closed = true;
     }
     /**
@@ -62,8 +67,6 @@ public class AppComunicador {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f))) {
             Object obj = ois.readObject();
             ois.close();
-            System.out.println("Condición: " + (obj instanceof ArrayList<?>));
-            System.out.println(obj);
             if (obj instanceof ArrayList<?>) {
                 return (ArrayList<Usuario>) obj;
             }

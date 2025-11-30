@@ -1,3 +1,6 @@
+datos/lista_tareas.dat
+datos/usuarios.dat
+
 bin/
 *.class
 

@@ -51,15 +51,31 @@ public class EstadoAgregarUsuario extends Estado {
      * @return {@code true} si se agregó al usuario a la lista de usuarios y {@code false} si no.
      */
     private boolean agregaUsuario(Scanner s) throws Exception {
+        List<Usuario> usuarios = AppComunicador.getInstancia().getListaUsuarios();
         System.out.print("Nombre: ");
+        s.nextLine();
         String nombre = s.nextLine();
-        System.out.print("Nombre de usuario: ");
-        String nickname = s.nextLine();
+        String nickname;
+        boolean existeNickname;
+        do {
+            existeNickname = false;
+            System.out.print("Nombre de usuario: ");
+            nickname = s.nextLine();
+            for (Usuario usuario : usuarios) {
+                if (nickname.equals(usuario.getNickname())) {
+                    existeNickname = true;
+                    System.out.println("Ya existe un usuario con el nombre de usuario ingresado. " +
+                                        "Por favor, ingrese uno diferente."
+                    );
+                    break;
+                }
+            }
+        } while (existeNickname);
         System.out.print("Correo electrónico: ");
         String email = s.nextLine();
         System.out.print("Contraseña: ");
         String password = s.nextLine();
-        TipoUsuario rol = null;
+        TipoUsuario rol;
         MenuRoles menuRoles = new MenuRoles();
         menuRoles.close();
         MetodosGenerales.solicitaEntrada(s, menuRoles, "¿Qué rol le asigna?");
@@ -79,11 +95,9 @@ public class EstadoAgregarUsuario extends Estado {
 
         try {
             if (usuarioConfirma(s)) {
-                // Aquí usamos el singleton SOLO desde el estado 
                 Administrador admin = (Administrador) AppComunicador.getInstancia().getUsuarioActual();
-                List<Usuario> lista = AppComunicador.getInstancia().getListaUsuarios();
 
-                admin.agregarUsuario(lista, nombre, nickname, email, password, rol);
+                admin.agregarUsuario(usuarios, nombre, nickname, email, password, rol);
                 return true; // <--- Si se añade.
             }
         } catch (UsuarioExisteException uee) {

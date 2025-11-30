@@ -24,6 +24,7 @@ public class AppAlt {
     /* ----- VARIABLES PARA LA MÁQUINA ----- */
     public static void main(String[] args) throws Exception {
         verificarListaInicial();
+        System.out.println(AppComunicador.getInstancia().getListaUsuarios()); // TODO: Quitar al finalizar el programa (sirve para ver los usuarios existentes)
         System.out.println("\n¡Bienvenido a nuestra App de Gestión de Tareas!" +
                             "\nGracias por su preferencia."
         );
@@ -32,6 +33,7 @@ public class AppAlt {
             estadoActual = estadoActual.ejecutar(s);
         }
         s.close();
+        AppComunicador.getInstancia().close();
         /* ----- MÁQUINA DE ESTADOS ----- */
     }
     /**
