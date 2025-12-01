@@ -3,7 +3,6 @@ package estados.actualizarTareas;
 import java.util.Scanner;
 
 import estados.Estado;
-import estados.EstadoUsoGeneral;
 import estados.EstadosApp;
 import estados.MetodosGenerales;
 import singleton.AppComunicador;

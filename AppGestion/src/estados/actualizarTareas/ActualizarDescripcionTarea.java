@@ -4,12 +4,8 @@ import java.util.Scanner;
 
 import estados.Estado;
 import estados.EstadosApp;
-import estados.MetodosGenerales;
-import menues.MenuDicotomico;
-import recursos.EstadoTarea;
 import singleton.AppComunicador;
 import tareas.ListaTareas;
-import tareas.Tarea;
 import usuarios.Usuario;
 
 public class ActualizarDescripcionTarea extends EstadoActualizarTareas {
@@ -18,8 +14,9 @@ public class ActualizarDescripcionTarea extends EstadoActualizarTareas {
         Usuario usuarioActual = AppComunicador.getInstancia().getUsuarioActual();
         ListaTareas listaTareas = AppComunicador.getInstancia().getListaTareas();
         String nuevaDescripcion;
-        
+
         System.out.println("Ingrese la nueva descripción de su tarea:");
+        s.nextLine();
         nuevaDescripcion = s.nextLine(); //TODO: OPCIONAL excepciones long.
         listaTareas.actualizarDescripcion(usuarioActual, getIdTarea(), nuevaDescripcion);
         System.out.println("Su descripción se ha actualizado.");

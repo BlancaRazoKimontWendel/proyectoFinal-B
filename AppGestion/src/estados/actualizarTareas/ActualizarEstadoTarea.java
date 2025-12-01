@@ -19,7 +19,8 @@ public class ActualizarEstadoTarea extends EstadoActualizarTareas {
         ListaTareas listaTareas = AppComunicador.getInstancia().getListaTareas();
         Tarea tarea = listaTareas.buscarPorId(getIdTarea());
         MenuDicotomico menuDicotomico = new MenuDicotomico();
-
+        menuDicotomico.close();
+        
         switch (tarea.getEstado()) {
             case EstadoTarea.PENDIENTE:
                 MetodosGenerales.solicitaEntrada(s, menuDicotomico, "Su tarea se encuentra en estado PENDIENTE." +

@@ -1,14 +1,11 @@
 package estados.actualizarTareas;
-import java.util.List;
 import java.util.Scanner;
 
 import estados.Estado;
 import estados.EstadoUsoGeneral;
 import estados.EstadosApp;
 import estados.MetodosGenerales;
-import menues.Menu;
 import menues.MenuClosedException;
-import menues.MenuDicotomico;
 import menues.MenuSalida;
 import recursos.EstadoTarea;
 import recursos.TipoUsuario;
@@ -46,30 +43,43 @@ class MenuDesarrollador extends MenuSalida {
  * @author Brayan Montiel Ramírez
  */
 public class EstadoActualizarTareas extends Estado {
-    private String idTarea; // ID de la tarea que se actualiza.
+    private String idTarea = null; // ID de la tarea que se actualiza.
 
     public Estado ejecutar(Scanner s) throws Exception {
         Usuario usuarioActual = AppComunicador.getInstancia().getUsuarioActual();
         ListaTareas listaTareas = AppComunicador.getInstancia().getListaTareas();
-        boolean operacionCancelada;
-        Estado estadoPrevio = AppComunicador.getInstancia().getEstadoPrevio();
+        Tarea tareaActualizada;
+        boolean operacionCancelada = false;
+        if (idTarea == null) {
+            /* Solicitud del id de la tarea */
+            do {
+                idTarea = solicitarIdTarea(s);
+                if (idTarea != null) {
+                    tareaActualizada = listaTareas.buscarPorId(idTarea);
+                    if (usuarioActual.getTipo() == TipoUsuario.DESARROLLADOR
+                        && ! tareaActualizada.getUsuarioAsignado().getId().equals(usuarioActual.getId())) {
+                            System.out.println("Esta tarea no es de su propiedad. " +
+                                                "Por favor, ingrese una que le pertenezca."
+                            );
+                            return new EstadoActualizarTareas();
+                        }
+                    break;
+                }
+                System.out.println("No existe una tarea con el ID ingresado.");
+                operacionCancelada = ! MetodosGenerales.repetirOperacion(s);
+            } while (! operacionCancelada);
+            if (operacionCancelada) {
+                return new EstadoUsoGeneral();
+            }
+        }
+        /* Validación de su estado */
+        tareaActualizada = listaTareas.buscarPorId(idTarea);
+        if (tareaActualizada.getEstado() == EstadoTarea.COMPLETADA) {
+            System.out.println("La tarea se encuentra en estado COMPLETADA, por lo cual ya no puede actualizarse.");
+            return new EstadoActualizarTareas();
+        }
         switch (usuarioActual.getTipo()) {
             case TipoUsuario.ADMINISTRADOR:
-                operacionCancelada = false;
-                if (idTarea == null) {
-                    /* Solicitud del id de la tarea */
-                    do {
-                        idTarea = solicitarIdTarea(s);
-                        if (idTarea != null) {
-                            break;
-                        }
-                        System.out.println("No existe una tarea con el ID ingresado.");
-                        operacionCancelada = ! MetodosGenerales.repetirOperacion(s);
-                    } while (! operacionCancelada);
-                    if (operacionCancelada) {
-                        return new EstadoUsoGeneral();
-                    }
-                }
                 /* Actualización de la tarea */
                 MenuAdministrador menuAdmin = new MenuAdministrador();
                 menuAdmin.close();
@@ -82,70 +92,54 @@ public class EstadoActualizarTareas extends Estado {
                     case '3':
                         return new ActualizarDescripcionTarea(idTarea);
                     case '4':
-                        break;
+                        if (tareaActualizada.getEstado() == EstadoTarea.EN_CURSO) {
+                            System.out.println("La tarea se encuentra EN CURSO, por lo cual ya no puede " +
+                                                "modificar su fecha estimada de inicio.");
+                            return new EstadoActualizarTareas(idTarea);
+                        }
+                        return new ActualizarFechaEstimadaInicioTarea(idTarea);
                     case '5':
-                        break;
+                        if (tareaActualizada.getEstado() == EstadoTarea.EN_CURSO) {
+                            System.out.println("La tarea se encuentra EN CURSO, por lo cual ya no puede " +
+                                                "modificar su fecha estimada de finalización.");
+                            return new EstadoActualizarTareas(idTarea);
+                        }
+                        return new ActualizarFechaEstimadaFinTarea(idTarea);
                     case MenuAdministrador.IDENTIFICADOR_REGRESAR:
                         return new EstadoUsoGeneral();
                     default:
-                        break;
+                        throw new Exception("Elección no identificada.");
                 }
-                operacionCancelada = false;
-                do {
-                    if (crearTarea(s, usuarioActual, usuarioDestino)) {
-                        System.out.println("Tarea creada con éxito.");
-                        break;
-                    }
-                    System.out.println("La tarea no ha sido creada.");
-                    operacionCancelada = ! MetodosGenerales.repetirOperacion(s);
-                } while (! operacionCancelada);
-                /*  PARA ABAJO NO ES VÁLIDO */
-                    case MenuActualizacionAdmin.OPCION_FECHA_INICIO:
-                        System.out.println("Ingrese la nueva fecha estimada de inicio:");
-                        String nuevaFechaInicio = s.nextLine(); // TODO: manejo de excepciones
-                        listaTareas.actualizarFechaEstimadaInicio(nuevoUsuario, id, nuevaFechaInicio);// TODO: manejo de excepciones
-                        break;
-                    case MenuActualizacionAdmin.OPCION_FECHA_FIN:
-                        System.out.println("Ingrese la nueva fecha estimada de inicio:");
-                        String nuevaFechaFin = s.nextLine(); // TODO: manejo de excepciones
-                        listaTareas.actualizarFechaEstimadaFin(nuevoUsuario, id, nuevaFechaFin);// TODO: manejo de excepciones
-                        break;
-                }
-                break;
             case TipoUsuario.DESARROLLADOR:
-                System.out.println("Ingrese el id de la tarea que desea modificar");
-                String id_ = s.nextLine(); //TODO: manejo de excepciones de entrada y de DEV accediendo a tareas de otros
-                MenuActualizacionDes menuActDes = new MenuActualizacionDes();
-                System.out.println(menuActDes);
-                System.out.println("¿Qué desea modificar?");
-                menuActAdmin.setEleccion(s.nextLine().charAt(0)); //TODO: manejo de excepciones
-                switch (menuActAdmin.getEleccion()) {
-                    case MenuActualizacionAdmin.OPCION_ESTADO:
-                        System.out.println("¿A qué estado pasará la tarea?");
-                        EstadoTarea nuevoEstado = getEleccionEstado(s); // TODO: manejo de excepciones
-                        listaTareas.cambiarEstado(usuarioActual, id_, nuevoEstado); // TODO: manejo de excepciones
-                        break;
-                    case MenuActualizacionAdmin.OPCION_DESCRIPCION:
-                        System.out.println("Ingrese la nueva descripción:");
-                        String nuevDescripcion = s.nextLine(); // TODO: manejo de excepciones
-                        listaTareas.actualizarDescripcion(usuarioActual, id_, nuevDescripcion); // TODO: manejo de excepciones
-                        break;
-                    case MenuActualizacionAdmin.OPCION_FECHA_INICIO:
-                        System.out.println("Ingrese la nueva fecha estimada de inicio:");
-                        String nuevaFechaInicio = s.nextLine(); // TODO: manejo de excepciones
-                        listaTareas.actualizarFechaEstimadaInicio(usuarioActual, id_, nuevaFechaInicio);// TODO: manejo de excepciones
-                        break;
-                    case MenuActualizacionAdmin.OPCION_FECHA_FIN:
-                        System.out.println("Ingrese la nueva fecha estimada de inicio:");
-                        String nuevaFechaFin = s.nextLine(); // TODO: manejo de excepciones
-                        listaTareas.actualizarFechaEstimadaFin(usuarioActual, id_, nuevaFechaFin);// TODO: manejo de excepciones
-                        break;
+                /* Actualización de la tarea */
+                MenuDesarrollador menuDes = new MenuDesarrollador();
+                menuDes.close();
+                MetodosGenerales.solicitaEntrada(s, menuDes, "¿Qué desea modificar?");
+                switch (menuDes.getEleccion().getIdentificador()) {
+                    case '1':
+                        return new ActualizarEstadoTarea(idTarea);
+                    case '2':
+                        return new ActualizarDescripcionTarea(idTarea);
+                    case '3':
+                        if (tareaActualizada.getEstado().equals(EstadoTarea.EN_CURSO)) {
+                            System.out.println("Su tarea se encuentra EN CURSO, por lo cual ya no puede " +
+                                                "modificar su fecha estimada de inicio.");
+                            return new EstadoActualizarTareas(idTarea);
+                        }
+                        return new ActualizarFechaEstimadaInicioTarea(idTarea);
+                    case '4':
+                        if (tareaActualizada.getEstado().equals(EstadoTarea.EN_CURSO)) {
+                            System.out.println("Su tarea se encuentra EN CURSO, por lo cual ya no puede " +
+                                                "modificar su fecha estimada de inicio.");
+                            return new EstadoActualizarTareas(idTarea);
+                        }
+                        return new ActualizarFechaEstimadaFinTarea(idTarea);
+                    case MenuAdministrador.IDENTIFICADOR_REGRESAR:
+                        return new EstadoUsoGeneral();
+                    default:
+                        throw new Exception("Elección no identificada.");
                 }
-                // TODO: Modificar estado de sus tareas.
-                // TODO: Modificar descripción de sus tareas.
-                // TODO: Modificar fecha estimada de inicio de sus tareas.
-                // TODO: Modificar fecha estimada de fin de sus tareas.
-                break;
+            
             case TipoUsuario.INVITADO:
                 throw new Exception("Un invitado no debe tener acceso a esta opción.");
             default:

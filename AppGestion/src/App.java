@@ -34,7 +34,7 @@ public class App {
         /* ----- MÁQUINA DE ESTADOS ----- */
         while (! estadoActual.equals(estadoSalida)) {
             estadoActual = estadoActual.ejecutar(s);
-            AppComunicador.getInstancia().setEstadoPrevio(estadoActual);
+            //AppComunicador.getInstancia().setEstadoPrevio(estadoActual);
         }
         s.close();
         AppComunicador.getInstancia().close();

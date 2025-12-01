@@ -102,12 +102,12 @@ public class EstadoCrearTarea extends Estado {
                                                                     hoy, 
                                                                     "La fecha estimada de inicio no puede ser anterior a hoy.");
         /* Fecha estimada de fin */
-        fechaEstimadaFin = MetodosGenerales.solicitaFechaAntes(s,
+        fechaEstimadaFin = MetodosGenerales.solicitaFechaDespues(s,
                                                                 "Fecha estimada de fin (DD/MM/AAAA):",
                                                                 fechaEstimadaInicio, 
                                                                 "La fecha estimada de fin no puede ser anterior a la de inicio.");
         if (MetodosGenerales.usuarioConfirma(s)) {
-            listaTareas.crearTarea(usuarioDestino, usuarioActual, descripcion, fechaEstimadaInicio, fechaEstimadaInicio);
+            listaTareas.crearTarea(usuarioActual, usuarioDestino, descripcion, fechaEstimadaInicio, fechaEstimadaInicio);
             return true;
         }
         return false;
