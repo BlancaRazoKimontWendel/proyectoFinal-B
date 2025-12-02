@@ -83,35 +83,48 @@ public class EstadoCrearTarea extends Estado {
         return usuarioDestino;
     }
     /**
-     * Crea una tarea para un usuario igual o diferente a quien la está creando.
-     * Sólo es accesible por un usuario de tipo Administrador.
+ * Crea una tarea para un usuario igual o diferente a quien la está creando.
+ * Se usa tanto cuando un ADMIN crea tareas para cualquier usuario,
+ * como cuando un DESARROLLADOR crea tareas para sí mismo.
      * @param s
      * @param nickname
      * @return
      */
-    private boolean crearTarea(Scanner s, Usuario usuarioActual, Usuario usuarioDestino) throws Exception {
-        ListaTareas listaTareas = AppComunicador.getInstancia().getListaTareas();
-        System.out.println("Ingrese la descripción de la tarea: ");
-        String descripcion = s.nextLine(); // TODO: OPCIONAL manejo de excepciones long
-        LocalDate fechaEstimadaInicio;
-        LocalDate fechaEstimadaFin;
-        LocalDate hoy = LocalDate.now();
-        /* Fecha estimada de inicio */
-        fechaEstimadaInicio = MetodosGenerales.solicitaFechaDespues(s,
-                                                                    "Fecha estimada de inicio (DD/MM/AAAA):",
-                                                                    hoy, 
-                                                                    "La fecha estimada de inicio no puede ser anterior a hoy.");
-        /* Fecha estimada de fin */
-        fechaEstimadaFin = MetodosGenerales.solicitaFechaDespues(s,
-                                                                "Fecha estimada de fin (DD/MM/AAAA):",
-                                                                fechaEstimadaInicio, 
-                                                                "La fecha estimada de fin no puede ser anterior a la de inicio.");
-        if (MetodosGenerales.usuarioConfirma(s)) {
-            listaTareas.crearTarea(usuarioActual, usuarioDestino, descripcion, fechaEstimadaInicio, fechaEstimadaInicio);
-            return true;
-        }
-        return false;
+private boolean crearTarea(Scanner s, Usuario usuarioActual, Usuario usuarioDestino) throws Exception {
+    ListaTareas listaTareas = AppComunicador.getInstancia().getListaTareas();
+    System.out.println("Ingrese la descripción de la tarea: ");
+    String descripcion = s.nextLine(); 
+    LocalDate fechaEstimadaInicio;
+    LocalDate fechaEstimadaFin;
+    LocalDate hoy = LocalDate.now();
+    /* Fecha estimada de inicio */
+    fechaEstimadaInicio = MetodosGenerales.solicitaFechaDespues(
+            s,
+            "Fecha estimada de inicio (DD/MM/AAAA):",
+            hoy,
+            "La fecha estimada de inicio no puede ser anterior a hoy."
+    );
+    /* Fecha estimada de fin */
+    fechaEstimadaFin = MetodosGenerales.solicitaFechaDespues(
+            s,
+            "Fecha estimada de fin (DD/MM/AAAA):",
+            fechaEstimadaInicio,
+            "La fecha estimada de fin no puede ser anterior a la de inicio."
+    );
+    if (MetodosGenerales.usuarioConfirma(s)) {
+       
+        listaTareas.crearTarea(
+            usuarioActual,
+            usuarioDestino,
+            descripcion,
+            fechaEstimadaInicio,
+            fechaEstimadaFin   // <-- usar la fecha de fin correcta
+        );
+        return true;
     }
+    return false;
+}
+
     /* ----- CONSTRUCTOR ----- */
     public EstadoCrearTarea() {
         super(EstadosApp.CREAR_TAREA);
