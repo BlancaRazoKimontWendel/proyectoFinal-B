@@ -12,6 +12,25 @@ import recursos.TipoUsuario;
  * 
  * Esta clase representa a un usuario Desarrollador 
  */
+
+/**
+ * Representa a un usuario de tipo Desarrollador dentro del sistema.
+ * 
+ * El Desarrollador cuenta con permisos intermedios:
+ *  - Puede crear tareas únicamente para sí mismo.
+ *  - Puede visualizar únicamente sus propias tareas.
+ *  - Puede filtrar sus tareas por estado.
+ *  - Puede actualizar sus tareas (estado, descripción, fechas), 
+ *    respetando las restricciones del sistema.
+ * 
+ * Esta clase extiende {@link Usuario} y sirve como puente entre las
+ * acciones de un usuario estándar y el administrador.
+ *
+ * Forma parte del módulo de gestión de usuarios.
+ *
+ * @author Blanca Razo
+ */
+
 public class Desarrollador extends Usuario {
 
     public Desarrollador(String nombre, String nickname, String email, String password) {
