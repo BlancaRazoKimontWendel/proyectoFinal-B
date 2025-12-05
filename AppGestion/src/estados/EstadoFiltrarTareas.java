@@ -12,6 +12,21 @@ import recursos.TipoUsuario;
 import singleton.AppComunicador;
 import tareas.ListaTareas;
 import usuarios.Usuario;
+/**
+ * Estado de la máquina de estados encargado de gestionar la funcionalidad
+ * de filtrado de tareas.
+ * 
+ * Comportamiento según el tipo de usuario:
+ *  - ADMINISTRADOR: Puede filtrar tareas por estado y por usuario.
+ *  - DESARROLLADOR: Puede filtrar únicamente por estado, mostrando solo
+ *                   tareas que le pertenecen.
+ *  - INVITADO: Puede filtrar tareas por estado, con acceso de solo lectura.
+ * 
+ * Este estado hace uso de los menús dinámicos para seleccionar criterios
+ * de filtrado y delega en {@link ListaTareas} la impresión de los resultados.
+ *
+ * @author Blanca Razo
+ */
 
 /**
  * Menú de filtrado para ADMINISTRADOR:
