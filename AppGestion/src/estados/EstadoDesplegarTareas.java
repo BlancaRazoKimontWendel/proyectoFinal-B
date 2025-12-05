@@ -7,6 +7,17 @@ import singleton.AppComunicador;
 import tareas.ListaTareas;
 import usuarios.Usuario;
 
+/**
+ * Estado que permite mostrar las tareas registradas en el sistema.
+ * - ADMINISTRADOR: ve todas las tareas.
+ * - DESARROLLADOR: ve solo sus tareas.
+ * - INVITADO: puede visualizar todas las tareas.
+ *
+ * Esta clase forma parte de la máquina de estados de la aplicación.
+ *
+ * @author Blanca Razo
+ */
+
 public class EstadoDesplegarTareas extends Estado {
 
     @Override
