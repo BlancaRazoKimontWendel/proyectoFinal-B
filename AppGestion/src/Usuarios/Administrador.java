@@ -16,6 +16,27 @@ import java.util.List;
  * Ahora implementa la creación de usuarios y todos los métodos abstractos que exige Usuario.
  * ----- Mensaje para VISITANTES -----
  */
+
+/**
+ * Representa a un usuario de tipo Administrador dentro del sistema.
+ * 
+ * El Administrador es el usuario con mayores privilegios:
+ *  - Puede agregar nuevos usuarios al sistema.
+ *  - Puede crear tareas para cualquier usuario.
+ *  - Puede visualizar todas las tareas registradas.
+ *  - Puede filtrar tareas por estado o usuario.
+ *  - Puede actualizar cualquier tarea.
+ *  - Puede eliminar tareas.
+ * 
+ * Esta clase extiende {@link Usuario} e implementa la lógica relacionada 
+ * con la creación de usuarios, respetando las reglas del 
+ * nickname y del correo electrónico.
+ *
+ * Forma parte del módulo de gestión de usuarios.
+ *
+ * @author Blanca Razo
+ */
+
 public class Administrador extends Usuario {
 
     // ===== CONSTRUCTOR =====
